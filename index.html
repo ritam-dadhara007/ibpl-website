@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IBPL — Integrated Biophotonics Lab | IIT Dharwad</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Syne:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap');
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;overflow-x:hidden}
+:root{--black:#020206;--deep:#06060e;--panel:#0a0c1a;--card:#0e1225;--card2:#121836;--neon:#00e8fc;--neon2:#0af;--cyan-dim:#0891b2;--green:#22d3ee;--violet:#8b5cf6;--magenta:#d946ef;--rose:#f43f5e;--amber:#f59e0b;--white:#f0f6ff;--silver:#94a3c9;--muted:#4b5e87;--ghost:#1c2847;--border:rgba(0,232,252,0.06);--border2:rgba(0,232,252,0.15);--glow:rgba(0,232,252,0.08);--font-hero:'Bebas Neue',sans-serif;--font-head:'Syne',sans-serif;--font-mono:'Space Mono',monospace;--font-body:'DM Sans',sans-serif}
+body{font-family:var(--font-body);background:var(--black);color:var(--silver);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+::selection{background:var(--neon);color:var(--black)}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:var(--black)}::-webkit-scrollbar-thumb{background:var(--cyan-dim);border-radius:2px}
+a{color:inherit;text-decoration:none}
+.noise{position:fixed;inset:0;z-index:9998;pointer-events:none;opacity:0.025;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.scanline{position:fixed;inset:0;z-index:9997;pointer-events:none;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,232,252,0.007) 2px,rgba(0,232,252,0.007) 4px)}
+.vignette{position:fixed;inset:0;z-index:9996;pointer-events:none;background:radial-gradient(ellipse at center,transparent 40%,rgba(2,2,6,0.6))}
+#cosmos{position:fixed;inset:0;z-index:0;pointer-events:none}
+.topbar{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;justify-content:space-between;align-items:center;padding:1.2rem 3.5rem;transition:all .5s}
+.topbar.scrolled{backdrop-filter:blur(30px) saturate(1.8);background:rgba(2,2,6,0.6);border-bottom:1px solid var(--border)}
+.logo{display:flex;align-items:center;gap:.8rem;cursor:pointer}
+.logo-glyph{font-family:var(--font-hero);font-size:1.6rem;color:var(--neon);letter-spacing:3px;text-shadow:0 0 20px var(--glow)}
+.logo-sub{font-family:var(--font-mono);font-size:.5rem;color:var(--muted);letter-spacing:3px;text-transform:uppercase}
+.nav-links{display:flex;gap:.4rem;list-style:none}
+.nav-links a{font-family:var(--font-mono);font-size:.62rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);padding:.5rem 1rem;border-radius:4px;border:1px solid transparent;transition:all .3s;cursor:pointer}
+.nav-links a:hover,.nav-links a.active{color:var(--neon);border-color:var(--border2);background:var(--glow)}
+.burger{display:none;background:none;border:1px solid var(--border2);border-radius:4px;padding:8px;cursor:pointer;flex-direction:column;gap:4px}
+.burger span{width:18px;height:1.5px;background:var(--neon);border-radius:1px}
+.page{display:none;position:relative;z-index:1}.page.on{display:block;animation:pageIn .6s cubic-bezier(.22,1,.36,1) both}
+@keyframes pageIn{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+.hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:0 5vw;position:relative}
+.hero-tag{font-family:var(--font-mono);font-size:.58rem;letter-spacing:5px;text-transform:uppercase;color:var(--cyan-dim);margin-bottom:2rem;display:flex;align-items:center;gap:.8rem}
+.hero-tag .dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green);animation:blink 2s infinite}
+.hero h1{font-family:var(--font-hero);font-size:clamp(4rem,10vw,10rem);line-height:.88;letter-spacing:2px;color:var(--white);margin-bottom:1.5rem}
+.hero h1 span{display:block;background:linear-gradient(90deg,var(--neon),var(--green),var(--violet));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;filter:drop-shadow(0 0 40px var(--glow))}
+.hero-desc{font-size:1rem;line-height:1.8;color:var(--muted);max-width:520px;margin-bottom:2.5rem}
+.hero-cta{display:flex;gap:1rem;flex-wrap:wrap}
+.btn{font-family:var(--font-head);font-weight:700;font-size:.72rem;letter-spacing:1.5px;text-transform:uppercase;padding:.85rem 2.2rem;border-radius:6px;cursor:pointer;transition:all .35s;border:none}
+.btn-neon{background:var(--neon);color:var(--black);box-shadow:0 0 20px var(--glow)}.btn-neon:hover{transform:translateY(-3px);box-shadow:0 8px 40px rgba(0,232,252,.25)}
+.btn-wire{background:transparent;color:var(--neon);border:1.5px solid var(--border2)}.btn-wire:hover{background:var(--glow);transform:translateY(-3px)}
+.hero-scroll{position:absolute;bottom:2.5rem;left:50%;transform:translateX(-50%);text-align:center}
+.hero-scroll span{font-family:var(--font-mono);font-size:.5rem;letter-spacing:4px;color:var(--ghost);text-transform:uppercase;display:block;margin-bottom:.5rem}
+.hero-scroll .bar{width:1px;height:40px;margin:0 auto;background:linear-gradient(to bottom,var(--neon),transparent);animation:scrollP 2.5s infinite}
+.sec-label{font-family:var(--font-mono);font-size:.58rem;letter-spacing:6px;text-transform:uppercase;color:var(--cyan-dim);margin-bottom:.8rem;display:flex;align-items:center;gap:.8rem}
+.sec-label .ln{width:40px;height:1px;background:var(--neon)}
+.sec-title{font-family:var(--font-hero);font-size:clamp(2.5rem,6vw,6rem);line-height:.92;color:var(--white);letter-spacing:1px;margin-bottom:1.5rem}
+.sec-title em{font-style:normal;background:linear-gradient(90deg,var(--neon),var(--violet));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.sec-desc{font-size:1rem;line-height:1.85;color:var(--muted);max-width:600px;margin-bottom:3rem}
+.full-section{padding:8rem 5vw;position:relative}
+.full-section.alt{background:linear-gradient(180deg,var(--deep),var(--black))}
+.spectra-display{width:100%;height:300px;border-radius:12px;overflow:hidden;border:1px solid var(--border);background:var(--panel);position:relative;margin-bottom:3rem}
+.spectra-display svg{width:100%;height:100%}
+.spectra-grid{stroke:rgba(0,232,252,0.03);stroke-width:.5}.spectra-axis{stroke:var(--ghost);stroke-width:.5}
+.spectra-line{fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.spectra-glow{fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;opacity:.25;filter:blur(3px)}
+.spectra-label{font-family:var(--font-mono);font-size:8px;fill:var(--muted)}
+.spectra-peak-label{font-family:var(--font-mono);font-size:7px;fill:var(--neon)}
+.spectra-title-text{font-family:var(--font-mono);font-size:9px;fill:var(--cyan-dim);letter-spacing:2px}
+.equip-section{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center;padding:6rem 5vw}
+.equip-visual{height:450px;border-radius:16px;overflow:hidden;border:1px solid var(--border);background:var(--panel);display:grid;place-items:center}
+.equip-visual .microscope-svg{width:80%;max-width:300px;opacity:.9}
+.equip-specs{display:flex;flex-direction:column;gap:1.5rem}
+.spec-row{display:grid;grid-template-columns:140px 1fr;gap:1rem;padding:1rem 0;border-bottom:1px solid var(--border);font-size:.88rem}
+.spec-key{font-family:var(--font-mono);font-size:.65rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--neon)}.spec-val{color:var(--silver)}
+.research-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:1.5rem}
+.r-card{background:linear-gradient(160deg,var(--card),var(--card2));border:1px solid var(--border);border-radius:12px;padding:2.5rem;position:relative;overflow:hidden;transition:all .45s cubic-bezier(.22,1,.36,1)}
+.r-card .corner{position:absolute;width:20px;height:20px;border-color:var(--border2);border-style:solid;transition:border-color .3s}
+.r-card .corner.tl{top:8px;left:8px;border-width:1px 0 0 1px;border-radius:4px 0 0 0}.r-card .corner.tr{top:8px;right:8px;border-width:1px 1px 0 0;border-radius:0 4px 0 0}
+.r-card .corner.bl{bottom:8px;left:8px;border-width:0 0 1px 1px;border-radius:0 0 0 4px}.r-card .corner.br{bottom:8px;right:8px;border-width:0 1px 1px 0;border-radius:0 0 4px 0}
+.r-card:hover{transform:translateY(-6px);border-color:var(--border2);box-shadow:0 20px 60px rgba(0,0,0,.4),0 0 40px var(--glow)}.r-card:hover .corner{border-color:var(--neon)}
+.r-icon{font-size:1.6rem;margin-bottom:1.2rem;display:block}
+.r-card h3{font-family:var(--font-head);font-weight:700;font-size:1.15rem;color:var(--white);margin-bottom:.7rem}
+.r-card p{font-size:.86rem;line-height:1.75}
+.tags{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:1.2rem}
+.tag{font-family:var(--font-mono);font-size:.52rem;letter-spacing:1px;padding:.2rem .55rem;border-radius:3px;background:rgba(0,232,252,.04);color:var(--cyan-dim);border:1px solid var(--border)}
+.pi-block{display:grid;grid-template-columns:200px 1fr;gap:3rem;padding:3.5rem;background:linear-gradient(160deg,var(--card),var(--card2));border:1px solid var(--border2);border-radius:16px;margin-bottom:3rem;position:relative;overflow:hidden}
+.pi-block::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--neon),var(--violet),var(--magenta),var(--amber))}
+.pi-av{width:180px;height:180px;border-radius:16px;background:linear-gradient(135deg,var(--neon),var(--violet));display:grid;place-items:center;font-family:var(--font-hero);font-size:3.5rem;color:var(--black);position:relative}
+.pi-av::before{content:'';position:absolute;inset:-6px;border-radius:20px;border:1.5px solid var(--border2)}
+.pi-name{font-family:var(--font-hero);font-size:2.5rem;color:var(--white);letter-spacing:1px;margin-bottom:.3rem}
+.pi-pos{font-family:var(--font-mono);font-size:.68rem;color:var(--neon);letter-spacing:2px;margin-bottom:1.5rem}
+.tl{display:flex;flex-direction:column;gap:.5rem}
+.tl-r{display:grid;grid-template-columns:70px 1fr;gap:1rem;font-size:.85rem;padding:.45rem 0;border-bottom:1px solid var(--border)}.tl-r:last-child{border-bottom:none}
+.tl-y{font-family:var(--font-mono);font-size:.62rem;color:var(--violet);padding-top:3px}
+.socials{display:flex;gap:.6rem;margin-top:1.5rem}
+.soc{width:38px;height:38px;border-radius:6px;border:1px solid var(--border);display:grid;place-items:center;font-size:.75rem;color:var(--muted);transition:all .3s;text-decoration:none}
+.soc:hover{border-color:var(--neon);color:var(--neon);background:var(--glow);transform:translateY(-2px)}
+.stu-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.5rem}
+.stu{background:linear-gradient(160deg,var(--card),var(--card2));border:1px solid var(--border);border-radius:12px;padding:2rem;text-align:center;transition:all .4s}
+.stu:hover{border-color:var(--border2);transform:translateY(-5px)}
+.stu-av{width:80px;height:80px;border-radius:50%;margin:0 auto 1rem;display:grid;place-items:center;font-family:var(--font-hero);font-size:1.6rem;color:var(--black);position:relative}
+.stu-av::after{content:'';position:absolute;inset:-4px;border-radius:50%;border:1.5px solid var(--border2)}
+.stu h4{font-family:var(--font-head);font-weight:700;font-size:1rem;color:var(--white);margin-bottom:.3rem}
+.stu-role{font-family:var(--font-mono);font-size:.6rem;color:var(--neon);letter-spacing:1px;margin-bottom:.5rem}
+.stu-deg{font-size:.82rem;color:var(--muted);line-height:1.6}
+.pub-feed{max-width:960px;margin:0 auto;display:flex;flex-direction:column;gap:.6rem;counter-reset:p}
+.pub{counter-increment:p;display:grid;grid-template-columns:44px 1fr;gap:1.2rem;padding:1.4rem 1.8rem;border-radius:8px;border:1px solid var(--border);background:linear-gradient(160deg,var(--card),rgba(12,18,37,.6));transition:all .35s;align-items:start}
+.pub:hover{border-color:var(--border2);transform:translateX(10px);background:var(--card2)}
+.pub-n{font-family:var(--font-mono);font-size:.68rem;color:var(--neon);opacity:.5;padding-top:3px}.pub-n::before{content:counter(p,decimal-leading-zero)}
+.pub h4{font-family:var(--font-head);font-size:.92rem;font-weight:600;color:var(--white);line-height:1.45;margin-bottom:.3rem}
+.pub .m{font-size:.76rem;color:var(--muted);line-height:1.5}
+.pub .j{color:var(--cyan-dim);font-style:italic}
+.pub .badge{font-family:var(--font-mono);font-size:.5rem;padding:.15rem .45rem;border-radius:3px;background:rgba(139,92,246,.1);color:var(--violet);border:1px solid rgba(139,92,246,.15);margin-left:.4rem}
+.news-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:1.5rem}
+.n-card{background:linear-gradient(160deg,var(--card),var(--card2));border:1px solid var(--border);border-radius:12px;padding:2.2rem;transition:all .4s;position:relative;overflow:hidden}
+.n-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--neon),var(--violet));opacity:0;transition:opacity .3s}
+.n-card:hover{border-color:var(--border2);transform:translateY(-4px)}.n-card:hover::before{opacity:1}
+.n-card h3{font-family:var(--font-head);font-weight:700;font-size:1.1rem;color:var(--white);margin-bottom:1rem}
+.aw{list-style:none;display:flex;flex-direction:column;gap:.7rem}
+.aw li{font-size:.85rem;line-height:1.65;padding-left:1.3rem;position:relative}.aw li::before{content:'▸';position:absolute;left:0;color:var(--neon);font-weight:700}
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:4rem}
+.c-left h3{font-family:var(--font-hero);font-size:2.5rem;color:var(--white);letter-spacing:1px;margin-bottom:1.2rem}.c-left>p{line-height:1.8;margin-bottom:2rem}
+.c-row{display:flex;align-items:center;gap:1rem;margin-bottom:1rem}
+.c-ico{width:42px;height:42px;border-radius:8px;background:var(--glow);border:1px solid var(--border);display:grid;place-items:center;font-size:1rem;flex-shrink:0}
+.c-row span{font-size:.9rem}.c-row a{color:var(--neon)}.c-row a:hover{text-decoration:underline}
+.c-form{display:flex;flex-direction:column;gap:1rem}
+.c-form input,.c-form textarea{padding:1rem 1.3rem;border-radius:6px;border:1px solid var(--border);background:var(--card);color:var(--white);font-family:var(--font-body);font-size:.88rem;outline:none;transition:all .3s}
+.c-form input:focus,.c-form textarea:focus{border-color:var(--neon);box-shadow:0 0 0 3px var(--glow)}
+.c-form textarea{min-height:120px;resize:vertical}.c-form input::placeholder,.c-form textarea::placeholder{color:var(--ghost)}
+.foot{border-top:1px solid var(--border);padding:2rem 5vw;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;position:relative;z-index:1}
+.foot p{font-family:var(--font-mono);font-size:.6rem;color:var(--ghost)}.foot a{color:var(--cyan-dim)}
+.f-links{display:flex;gap:1.5rem}.f-links a{font-family:var(--font-mono);font-size:.6rem;color:var(--ghost);transition:color .3s}.f-links a:hover{color:var(--neon)}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}@keyframes scrollP{0%,100%{opacity:.3}50%{opacity:1}}
+.rv{opacity:0;transform:translateY(30px);transition:all .7s cubic-bezier(.22,1,.36,1)}.rv.vis{opacity:1;transform:translateY(0)}
+@media(max-width:900px){.topbar{padding:.8rem 1.5rem}.nav-links{display:none}.nav-links.open{display:flex;flex-direction:column;position:absolute;top:100%;left:0;right:0;background:rgba(2,2,6,.95);backdrop-filter:blur(20px);padding:1rem;border-bottom:1px solid var(--border);gap:.4rem}.burger{display:flex}.hero h1{font-size:clamp(3rem,12vw,6rem)}.equip-section{grid-template-columns:1fr;gap:2rem}.equip-visual{height:300px}.pi-block{grid-template-columns:1fr;text-align:center}.pi-av{margin:0 auto;width:120px;height:120px;font-size:2.5rem}.contact-grid{grid-template-columns:1fr;gap:2rem}.foot{flex-direction:column;text-align:center}}
+</style>
+</head>
+<body>
+<canvas id="cosmos"></canvas>
+<div class="noise"></div><div class="scanline"></div><div class="vignette"></div>
+<nav class="topbar" id="topbar">
+<div class="logo" onclick="go('home')"><div><div class="logo-glyph">IBPL</div><div class="logo-sub">IIT Dharwad</div></div></div>
+<ul class="nav-links" id="navLinks">
+<li><a onclick="go('home')" data-p="home" class="active">Home</a></li>
+<li><a onclick="go('about')" data-p="about">About</a></li>
+<li><a onclick="go('equipment')" data-p="equipment">Equipment</a></li>
+<li><a onclick="go('research')" data-p="research">Research</a></li>
+<li><a onclick="go('team')" data-p="team">Team</a></li>
+<li><a onclick="go('publications')" data-p="publications">Publications</a></li>
+<li><a onclick="go('news')" data-p="news">News</a></li>
+<li><a onclick="go('contact')" data-p="contact">Contact</a></li>
+</ul>
+<button class="burger" onclick="document.getElementById('navLinks').classList.toggle('open')"><span></span><span></span><span></span></button>
+</nav>
+
+<div class="page on" id="p-home">
+<section class="hero">
+<div class="hero-tag"><div class="dot"></div>IIT Dharwad · Biosciences & Bioengineering</div>
+<h1>INTEGRATED<br><span>BIOPHOTONICS</span><br>LABORATORY</h1>
+<p class="hero-desc">Employing Raman, Fluorescence & SWIR spectroscopy combined with advanced proteomics to solve biomedical problems — from diagnosis to therapeutic monitoring.</p>
+<div class="hero-cta"><button class="btn btn-neon" onclick="go('research')">EXPLORE RESEARCH ↗</button><button class="btn btn-wire" onclick="go('equipment')">OUR EQUIPMENT</button></div>
+<div class="hero-scroll"><span>Scroll to discover</span><div class="bar"></div></div>
+</section>
+<div style="display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
+<div style="text-align:center;padding:2.5rem 1rem;border-right:1px solid var(--border)"><div style="font-family:var(--font-hero);font-size:2.8rem;color:var(--white)"><span style="color:var(--neon)" data-c="27">0</span>+</div><div style="font-family:var(--font-mono);font-size:.58rem;letter-spacing:3px;color:var(--muted);margin-top:.4rem;text-transform:uppercase">Publications</div></div>
+<div style="text-align:center;padding:2.5rem 1rem;border-right:1px solid var(--border)"><div style="font-family:var(--font-hero);font-size:2.8rem;color:var(--white)"><span style="color:var(--neon)" data-c="5">0</span></div><div style="font-family:var(--font-mono);font-size:.58rem;letter-spacing:3px;color:var(--muted);margin-top:.4rem;text-transform:uppercase">Researchers</div></div>
+<div style="text-align:center;padding:2.5rem 1rem;border-right:1px solid var(--border)"><div style="font-family:var(--font-hero);font-size:2.8rem;color:var(--white)"><span style="color:var(--neon)" data-c="4">0</span>+</div><div style="font-family:var(--font-mono);font-size:.58rem;letter-spacing:3px;color:var(--muted);margin-top:.4rem;text-transform:uppercase">Book Chapters</div></div>
+<div style="text-align:center;padding:2.5rem 1rem"><div style="font-family:var(--font-hero);font-size:2.8rem;color:var(--white)"><span style="color:var(--neon)" data-c="4">0</span></div><div style="font-family:var(--font-mono);font-size:.58rem;letter-spacing:3px;color:var(--muted);margin-top:.4rem;text-transform:uppercase">PhD Students</div></div>
+</div>
+<div class="full-section"><div class="sec-label"><div class="ln"></div>SIGNATURE TECHNIQUE</div><div class="sec-title">THE POWER OF<br><em>RAMAN SPECTRA</em></div><p class="sec-desc">Every molecule has a unique Raman fingerprint. We decode these spectral signatures to diagnose diseases, detect antibiotic resistance, and monitor metabolic pathways — all without labels or stains.</p><div class="spectra-display" id="spectraHome"></div></div>
+</div>
+
+<div class="page" id="p-about"><div class="full-section"><div class="sec-label"><div class="ln"></div>SYSTEM OVERVIEW</div><div class="sec-title">ABOUT <em>IBPL</em></div><p class="sec-desc">The central theme of IBPL is to establish and translate an integrated biophotonics approach for imaging and disease diagnosis — from morphology to biochemical dynamic equilibrium.</p>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin-bottom:3rem"><div class="r-card rv"><div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div><h3>Our Mission</h3><p>Utilizing diverse spectroscopic modalities with advanced proteomics and analytical tools to objectively elucidate intrinsic molecular alterations in pathological conditions with high sensitivity and specificity.</p></div><div class="r-card rv"><div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div><h3>Core Techniques</h3><p>Raman spectroscopy (SERS, DSIP, hyperspectral), fluorescence spectroscopy, SWIR imaging, stable isotope probing, ML-driven bioanalytical pipelines, and confocal Raman imaging with WITec alpha300R.</p></div></div>
+<div class="spectra-display" id="spectraAbout"></div></div></div>
+
+<div class="page" id="p-equipment"><div class="full-section"><div class="sec-label"><div class="ln"></div>LAB INSTRUMENTATION</div><div class="sec-title">WITEC ALPHA300R<br><em>CONFOCAL RAMAN</em></div><p class="sec-desc">The WITec alpha300 R — the preeminent confocal Raman imaging system setting the benchmark in flexibility, sensitivity, speed, and performance.</p></div>
+<div class="equip-section"><div class="equip-visual"><svg class="microscope-svg" viewBox="0 0 300 400" xmlns="http://www.w3.org/2000/svg"><rect x="60" y="340" width="180" height="20" rx="4" fill="#0e1225" stroke="#00e8fc" stroke-width=".5" opacity=".8"/><rect x="80" y="320" width="140" height="25" rx="4" fill="#121836" stroke="#00e8fc" stroke-width=".5" opacity=".6"/><rect x="95" y="250" width="110" height="8" rx="2" fill="#1c2847" stroke="#00e8fc" stroke-width=".5"/><rect x="110" y="245" width="80" height="5" rx="1" fill="#0e1225" stroke="#0af" stroke-width=".3"/><rect x="140" y="120" width="20" height="200" rx="3" fill="#121836" stroke="#00e8fc" stroke-width=".5"/><rect x="100" y="90" width="100" height="35" rx="6" fill="#0e1225" stroke="#00e8fc" stroke-width=".7"/><rect x="108" y="96" width="30" height="22" rx="3" fill="#0a0c1a" stroke="#0af" stroke-width=".4"/><rect x="135" y="125" width="30" height="50" rx="4" fill="#1c2847" stroke="#00e8fc" stroke-width=".6"/><rect x="140" y="175" width="20" height="20" rx="2" fill="#0e1225" stroke="#8b5cf6" stroke-width=".5"/><circle cx="150" cy="200" r="6" fill="none" stroke="#00e8fc" stroke-width=".8"><animate attributeName="r" values="5;7;5" dur="3s" repeatCount="indefinite"/><animate attributeName="opacity" values="1;.4;1" dur="3s" repeatCount="indefinite"/></circle><line x1="150" y1="200" x2="150" y2="248" stroke="#00e8fc" stroke-width="1" opacity=".4"><animate attributeName="opacity" values=".2;.6;.2" dur="2s" repeatCount="indefinite"/></line><line x1="150" y1="200" x2="150" y2="248" stroke="#00e8fc" stroke-width="4" opacity=".08" filter="blur(3px)"/><rect x="185" y="70" width="25" height="30" rx="4" fill="#121836" stroke="#8b5cf6" stroke-width=".5" transform="rotate(-15,197,85)"/><rect x="200" y="150" width="60" height="40" rx="5" fill="#0e1225" stroke="#00e8fc" stroke-width=".5"/><text x="215" y="173" font-family="Space Mono" font-size="6" fill="#00e8fc" opacity=".7">UHTS</text><path d="M165 110 Q200 110 200 150" fill="none" stroke="#8b5cf6" stroke-width="1" stroke-dasharray="3,3" opacity=".5"/><circle cx="150" cy="248" r="12" fill="#00e8fc" opacity=".06"/><circle cx="150" cy="248" r="25" fill="#00e8fc" opacity=".02"/><text x="40" y="380" font-family="Space Mono" font-size="8" fill="#4b5e87" letter-spacing="2">WITec alpha300 R</text></svg></div>
+<div><h3 style="font-family:var(--font-hero);font-size:2rem;color:var(--white);margin-bottom:1.5rem">SPECIFICATIONS</h3><div class="equip-specs"><div class="spec-row"><div class="spec-key">System</div><div class="spec-val">WITec alpha300 R — Confocal Raman Imaging Microscope</div></div><div class="spec-row"><div class="spec-key">Laser</div><div class="spec-val">532 nm (up to ~55 mW), fiber-coupled</div></div><div class="spec-row"><div class="spec-key">Resolution</div><div class="spec-val">~360 nm lateral (100× obj, 0.9 NA), &lt;1 µm depth</div></div><div class="spec-row"><div class="spec-key">Spectral</div><div class="spec-val">1 cm⁻¹ or ~3 cm⁻¹, UHTS spectrometer</div></div><div class="spec-row"><div class="spec-key">Detector</div><div class="spec-val">High-sensitivity EM-CCD</div></div><div class="spec-row"><div class="spec-key">Imaging</div><div class="spec-val">Hyperspectral — complete Raman spectrum at every pixel</div></div><div class="spec-row"><div class="spec-key">Scanning</div><div class="spec-val">XY planar & Z depth, TrueSurface topographic Raman</div></div><div class="spec-row"><div class="spec-key">Software</div><div class="spec-val">WITec Suite SEVEN — measurement & multivariate analysis</div></div></div></div></div>
+<div class="full-section"><div class="spectra-display" id="spectraEquip"></div></div></div>
+
+<div class="page" id="p-research"><div class="full-section"><div class="sec-label"><div class="ln"></div>RESEARCH MODULES</div><div class="sec-title">SPECTROSCOPY MEETS<br><em>BIOMEDICAL INNOVATION</em></div><p class="sec-desc">Our multidisciplinary approach combines optical spectroscopy with computational analytics to tackle real-world healthcare challenges.</p>
+<div class="research-grid">
+<div class="r-card rv"><div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div><span class="r-icon">🔬</span><h3>Raman Spectroscopy</h3><p>Label-free molecular fingerprinting for disease diagnosis, antibiotic resistance detection, and real-time metabolic monitoring at single-cell resolution.</p><div class="tags"><span class="tag">SERS</span><span class="tag">DSIP</span><span class="tag">Hyperspectral</span></div></div>
+<div class="r-card rv"><div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div><span class="r-icon">💡</span><h3>Fluorescence Spectroscopy</h3><p>Exploiting intrinsic tissue autofluorescence and extrinsic probes for non-invasive optical diagnostics and pathological analysis.</p><div class="tags"><span class="tag">Autofluorescence</span><span class="tag">Imaging</span></div></div>
+<div class="r-card rv"><div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div><span class="r-icon">🌐</span><h3>SWIR Spectroscopy</h3><p>Short-wave infrared techniques for deep-tissue diagnostics including middle ear effusion detection using ML classification.</p><div class="tags"><span class="tag">SWIR</span><span class="tag">Otoscopy</span><span class="tag">ML</span></div></div>
+<div class="r-card rv"><div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div><span class="r-icon">🧬</span><h3>Antimicrobial Resistance</h3><p>Pioneering Raman-based detection of colistin resistance and spectral markers like phosphoethanolamine for AMR profiling.</p><div class="tags"><span class="tag">Colistin</span><span class="tag">AMR</span><span class="tag">D₂O</span></div></div>
+<div class="r-card rv"><div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div><span class="r-icon">🧫</span><h3>Microbial Metabolomics</h3><p>Reverse stable isotope labeling with Raman for proteome dynamics, pathway monitoring, and cell oil biosynthesis tracking.</p><div class="tags"><span class="tag">Isotope Probing</span><span class="tag">Proteomics</span></div></div>
+<div class="r-card rv"><div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div><span class="r-icon">💎</span><h3>Biosensors & Nanophotonics</h3><p>Engineering metallic nanoparticle SERS substrates and smart biosensing platforms for enhanced molecular detection.</p><div class="tags"><span class="tag">SERS</span><span class="tag">Nanoparticles</span><span class="tag">PoC</span></div></div>
+</div></div></div>
+
+<div class="page" id="p-team"><div class="full-section"><div class="sec-label"><div class="ln"></div>PERSONNEL</div><div class="sec-title">THE <em>RESEARCH GROUP</em></div>
+<div class="pi-block rv"><div class="pi-av">SPS</div><div><div class="pi-name">DR. SURYA PRATAP SINGH</div><div class="pi-pos">PRINCIPAL INVESTIGATOR · ASSISTANT PROFESSOR, BSBE</div><div class="tl"><div class="tl-r"><span class="tl-y">2019–</span><span>Assistant Professor, Biosciences & Bioengineering, IIT Dharwad</span></div><div class="tl-r"><span class="tl-y">2018–19</span><span>Postdoc, Light & Video Lab, Stanford University, USA</span></div><div class="tl-r"><span class="tl-y">2016–18</span><span>Postdoc, Laser Biomedical Research Center, MIT, USA</span></div><div class="tl-r"><span class="tl-y">2014–15</span><span>Postdoc, SIB Labs, University of Eastern Finland</span></div><div class="tl-r"><span class="tl-y">2008–14</span><span>Ph.D., ACTREC, Tata Memorial Centre, Navi Mumbai</span></div></div><div class="socials"><a href="https://twitter.com/Surya_Singh01" target="_blank" class="soc">𝕏</a><a href="https://scholar.google.co.in/citations?user=1NGLa2wAAAAJ&hl=en" target="_blank" class="soc">🎓</a><a href="https://www.linkedin.com/in/surya-pratap-singh-8b7588140/" target="_blank" class="soc">in</a></div></div></div>
+<div class="stu-grid">
+<div class="stu rv"><div class="stu-av" style="background:linear-gradient(135deg,var(--neon),var(--violet))">DS</div><h4>Dimple Saikia</h4><p class="stu-role">PHD (THESIS SUBMITTED)</p><p class="stu-deg">M.Tech (Computational Biology)<br>Pondicherry University</p></div>
+<div class="stu rv"><div class="stu-av" style="background:linear-gradient(135deg,#06b6d4,var(--neon))">JK</div><h4>Jiro Karlo</h4><p class="stu-role">PHD STUDENT</p><p class="stu-deg">M.Sc. (Life Sciences)<br>Central Univ. of Punjab</p></div>
+<div class="stu rv"><div class="stu-av" style="background:linear-gradient(135deg,var(--violet),var(--magenta))">AV</div><h4>Arun Sree Vijay</h4><p class="stu-role">PHD STUDENT</p><p class="stu-deg">M.Sc. (Biotechnology)<br>Guru Nanak Dev Univ.</p></div>
+<div class="stu rv"><div class="stu-av" style="background:linear-gradient(135deg,var(--amber),var(--rose))">RD</div><h4>Ritam Dadhara</h4><p class="stu-role">PHD (ICMR FELLOW)</p><p class="stu-deg">M.Tech (Marine Biotech)<br>CUSAT, Kerala</p></div>
+</div></div></div>
+
+<div class="page" id="p-publications"><div class="full-section"><div class="sec-label"><div class="ln"></div>SCHOLARLY ARCHIVE · 27 PAPERS · 1670+ CITATIONS</div><div class="sec-title">COMPLETE <em>PUBLICATIONS</em></div>
+<div class="pub-feed">
+
+<div class="pub rv"><div class="pub-n"></div><div>
+<h4><a href="pdfs/paper1.pdf" target="_blank">Sensing and hyperspectral imaging of newly synthesized carotenoids in single-cell micro-factories</a></h4>
+<p class="m">Karlo J. et al. — <span class="j">Sensors and Actuators B: Chemical, 2026</span></p>
+</div></div>
+
+<div class="pub rv"><div class="pub-n"></div><div>
+<h4><a href="pdfs/paper2.pdf" target="_blank">Visualization of de novo synthesized nascent purine & pyrimidine using CIIST</a></h4>
+<p class="m">Karlo J. et al. — <span class="j">Analytica Chimica Acta, 2026</span></p>
+</div></div>
+
+<div class="pub rv"><div class="pub-n"></div><div>
+<h4><a href="pdfs/paper3.pdf" target="_blank">Raman Stable Isotope Probing (SIP): A novel bio-analytical tool</a></h4>
+<p class="m">Karlo J. et al. — <span class="j">TrAC Trends in Analytical Chemistry, 2025</span></p>
+</div></div>
+
+<div class="pub rv"><div class="pub-n"></div><div>
+<h4><a href="pdfs/paper4.pdf" target="_blank">Validating phosphoethanolamine modification as a spectral marker of colistin resistance</a></h4>
+<p class="m">Saikia D. et al. — <span class="j">Analyst, 2024</span></p>
+</div></div>
+
+<div class="pub rv"><div class="pub-n"></div><div>
+<h4><a href="pdfs/paper5.pdf" target="_blank">Validating heavy water (D₂O) as a Raman spectroscopic probe</a></h4>
+<p class="m">Saikia D. et al. — <span class="j">Spectrochimica Acta A, 2024</span></p>
+</div></div>
+
+<div class="pub rv"><div class="pub-n"></div><div>
+<h4><a href="pdfs/paper6.pdf" target="_blank">Sensing Bactericidal & Bacteriostatic Antimicrobial Mode via Raman DSIP</a></h4>
+<p class="m">Karlo J. et al. — <span class="j">ACS Omega, 2024</span></p>
+</div></div>
+
+<div class="pub rv"><div class="pub-n"></div><div>
+<h4><a href="pdfs/paper7.pdf" target="_blank">Tracking trash to treasure: microbial cell oil monitoring</a></h4>
+<p class="m">Karlo J. et al. — <span class="j">RSC Advances, 2024</span></p>
+</div></div>
+
+<div class="pub rv"><div class="pub-n"></div><div>
+<h4><a href="pdfs/paper8.pdf" target="_blank">In situ monitoring of the shikimate pathway via Raman reverse SIP</a></h4>
+<p class="m">Karlo J. et al. — <span class="j">Analyst, 2024</span></p>
+</div></div>
+
+<div class="pub rv"><div class="pub-n"></div><div>
+<h4><a href="pdfs/paper9.pdf" target="_blank">Reverse stable isotope labelling with Raman spectroscopy</a></h4>
+<p class="m">Karlo J. et al. — <span class="j">J. Biophotonics, 2024</span></p>
+</div></div>
+
+<div class="pub rv"><div class="pub-n"></div><div>
+<h4><a href="pdfs/paper10.pdf" target="_blank">Metallic Nanoparticles for SERS-Based Biosensing Applications</a></h4>
+<p class="m">Karlo J. et al. — <span class="j">Photochem, 2024</span></p>
+</div></div>
+
+<div class="pub rv"><div class="pub-n"></div><div>
+<h4><a href="pdfs/paper11.pdf" target="_blank">Recombinant L-Glutaminase characterization</a></h4>
+<p class="m">Bagewadi Z.K. et al. — <span class="j">IJBM, 2024</span></p>
+</div></div>
+
+<div class="pub rv"><div class="pub-n"></div><div>
+<h4><a href="pdfs/paper12.pdf" target="_blank">Recent advances in smart biosensing technology</a></h4>
+<p class="m">Saikia D. et al. — <span class="j">Elsevier Book</span></p>
+</div></div>
+
+<div class="pub rv"><div class="pub-n"></div><div>
+<h4><a href="pdfs/paper13.pdf" target="_blank">Imaging Based Raman Spectroscopy</a></h4>
+<p class="m">Springer Book Chapter</p>
+</div></div>
+
+<div class="pub rv"><div class="pub-n"></div><div>
+<h4><a href="pdfs/paper14.pdf" target="_blank">Monitoring microbial proteome dynamics using Raman SIP</a></h4>
+<p class="m">J. Biophotonics, 2023</p>
+</div></div>
+
+<div class="pub rv"><div class="pub-n"></div><div>
+<h4><a href="pdfs/paper15.pdf" target="_blank">Biophotonics in food technology</a></h4>
+<p class="m">JAFR, 2023</p>
+</div></div>
+
+<div class="pub rv"><div class="pub-n"></div><div>
+<h4><a href="pdfs/paper16.pdf" target="_blank">Aggregation-induced emission phosphors</a></h4>
+<p class="m">Wiley Book</p>
+</div></div>
+
+<div class="pub rv"><div class="pub-n"></div><div>
+<h4><a href="pdfs/paper17.pdf" target="_blank">Recombinant subtilisin characterization</a></h4>
+<p class="m">IJBM, 2023</p>
+</div></div>
+
+<div class="pub rv"><div class="pub-n"></div><div>
+<h4><a href="pdfs/paper18.pdf" target="_blank">Colistin resistance via Raman spectroscopy</a></h4>
+<p class="m">Biosensors, 2022</p>
+</div></div>
+
+<div class="pub rv"><div class="pub-n"></div><div>
+<h4><a href="pdfs/paper19.pdf" target="_blank">Raman study of mandibular bone</a></h4>
+<p class="m">Applied Spectroscopy, 2022</p>
+</div></div>
+
+<div class="pub rv"><div class="pub-n"></div><div>
+<h4><a href="pdfs/paper20.pdf" target="_blank">Growth kinetics monitoring of pathogens</a></h4>
+<p class="m">Applied Spectroscopy, 2022</p>
+</div></div>
+
+<div class="pub rv"><div class="pub-n"></div><div>
+<h4><a href="pdfs/paper21.pdf" target="_blank">Green synthesis of silver nanoparticles</a></h4>
+<p class="m">ACS Omega, 2022</p>
+</div></div>
+
+<div class="pub rv"><div class="pub-n"></div><div>
+<h4><a href="pdfs/paper22.pdf" target="_blank">Iturin A biosurfactant characterization</a></h4>
+<p class="m">Gels, 2022</p>
+</div></div>
+
+<div class="pub rv"><div class="pub-n"></div><div>
+<h4><a href="pdfs/paper23.pdf" target="_blank">Raman-based risk prediction in oral cancer</a></h4>
+<p class="m">Lasers Med Sci, 2021</p>
+</div></div>
+
+<div class="pub rv"><div class="pub-n"></div><div>
+<h4><a href="pdfs/paper24.pdf" target="_blank">SWIR otoscopy with machine learning</a></h4>
+<p class="m">Scientific Reports, 2021</p>
+</div></div>
+
+<div class="pub rv"><div class="pub-n"></div><div>
+<h4><a href="pdfs/paper25.pdf" target="_blank">Optical Imaging in Biology</a></h4>
+<p class="m">Springer Book</p>
+</div></div>
+
+<div class="pub rv"><div class="pub-n"></div><div>
+<h4><a href="pdfs/paper26.pdf" target="_blank">Direct observation of glucose fingerprint using Raman spectroscopy</a></h4>
+<p class="m">Science Advances, 2020</p>
+</div></div>
+
+<div class="pub rv"><div class="pub-n"></div><div>
+<h4><a href="pdfs/paper27.pdf" target="_blank">Spectrochemical probing of microRNA duplex</a></h4>
+<p class="m">Analytical Chemistry, 2020</p>
+</div></div>
+
+</div>
+<p style="text-align:center;margin-top:2.5rem"><a href="https://scholar.google.co.in/citations?user=1NGLa2wAAAAJ&hl=en" target="_blank" class="btn btn-wire" style="display:inline-flex">VIEW ALL ON GOOGLE SCHOLAR ↗</a></p>
+</div></div>
+
+<div class="page" id="p-news"><div class="full-section"><div class="sec-label"><div class="ln"></div>RECOGNITION</div><div class="sec-title">NEWS & <em>AWARDS</em></div>
+<div class="news-grid">
+<div class="n-card rv"><h3>🏆 Dimple Saikia</h3><ul class="aw"><li>Raman Charpak Fellowship 2022 — Indo-French Centre for Advanced Research</li><li>International Travel Grant — 14th Intl. Conf. Clinical Spectroscopy</li><li>Young Investigator Best Paper Award — SPIE Photonics West 2025</li></ul></div>
+<div class="n-card rv"><h3>🏆 Jiro Karlo</h3><ul class="aw"><li>Travel Grants from CSIR, ANRF & DBT — SPIE Photonics West 2025, San Francisco</li><li>Best Poster — CEFIPRA Indo-French Vibrational Spectroscopy Workshop</li><li>Best Poster (Cash) — Intl. Conf. Nanoscience & Photonics, Manipal</li><li>Visiting Scholar — Team Finland, Univ. of Eastern Finland</li></ul></div>
+<div class="n-card rv"><h3>🏆 Arun Sree Vijay</h3><ul class="aw"><li>1st Prize — Content creation, marine & space exploration, BIRAC/ILS Bhubaneswar, 2024</li></ul></div>
+</div></div></div>
+
+<div class="page" id="p-contact"><div class="full-section"><div class="sec-label"><div class="ln"></div>COMMUNICATION LINK</div><div class="sec-title">GET IN <em>TOUCH</em></div>
+<div class="contact-grid"><div class="c-left rv"><h3>COLLABORATE WITH US</h3><p>We welcome prospective PhD students, postdocs, collaborators, and industry partners passionate about spectroscopy and biomedical diagnostics.</p>
+<div class="c-row"><div class="c-ico">👤</div><span><strong style="color:var(--white)">Dr. Surya Pratap Singh</strong><br>Assistant Professor, BSBE</span></div>
+<div class="c-row"><div class="c-ico">🏛️</div><span>Indian Institute of Technology Dharwad<br>Dharwad, Karnataka – 580011, India</span></div>
+<div class="c-row"><div class="c-ico">✉️</div><span><a href="mailto:ssingh@iitdh.ac.in">ssingh@iitdh.ac.in</a></span></div>
+<div class="c-row"><div class="c-ico">🌐</div><span><a href="https://iitdh.ac.in" target="_blank">iitdh.ac.in</a></span></div></div>
+<div class="c-form rv"><input placeholder="Your Name"><input placeholder="Email Address"><input placeholder="Subject"><textarea placeholder="Your Message"></textarea><button class="btn btn-neon" style="align-self:flex-start">TRANSMIT MESSAGE ↗</button></div></div>
+</div></div>
+
+<footer class="foot"><p>© 2026 Integrated Biophotonics Lab · <a href="https://iitdh.ac.in" target="_blank">IIT Dharwad</a></p><div class="f-links"><a href="https://scholar.google.co.in/citations?user=1NGLa2wAAAAJ&hl=en" target="_blank">Google Scholar</a><a href="https://twitter.com/Surya_Singh01" target="_blank">Twitter</a><a href="https://www.linkedin.com/in/surya-pratap-singh-8b7588140/" target="_blank">LinkedIn</a></div></footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+const cv=document.getElementById('cosmos'),rr=new THREE.WebGLRenderer({canvas:cv,alpha:true,antialias:true});rr.setSize(innerWidth,innerHeight);rr.setPixelRatio(Math.min(devicePixelRatio,2));const sc=new THREE.Scene(),cam=new THREE.PerspectiveCamera(50,innerWidth/innerHeight,.1,1000);cam.position.z=40;const cols=[new THREE.Color(0x00e8fc),new THREE.Color(0x8b5cf6),new THREE.Color(0x22d3ee),new THREE.Color(0xf59e0b)];
+const hN=400,hP=new Float32Array(hN*3),hC=new Float32Array(hN*3);for(let i=0;i<hN;i++){const i3=i*3,t=(i/hN)*Math.PI*12,s=i%2?1:-1;hP[i3]=Math.cos(t+s*1.2)*6+20;hP[i3+1]=(i/hN)*70-35;hP[i3+2]=Math.sin(t+s*1.2)*6-12;const c=cols[i%4];hC[i3]=c.r;hC[i3+1]=c.g;hC[i3+2]=c.b;}const hG=new THREE.BufferGeometry();hG.setAttribute('position',new THREE.BufferAttribute(hP,3));hG.setAttribute('color',new THREE.BufferAttribute(hC,3));const hM=new THREE.PointsMaterial({size:.2,vertexColors:true,transparent:true,opacity:.55,blending:THREE.AdditiveBlending,sizeAttenuation:true});const helix=new THREE.Points(hG,hM);sc.add(helix);
+const lP=[],hp=hP;for(let i=0;i<hN;i++)for(let j=i+1;j<Math.min(i+15,hN);j++){const dx=hp[i*3]-hp[j*3],dy=hp[i*3+1]-hp[j*3+1],dz=hp[i*3+2]-hp[j*3+2];if(Math.sqrt(dx*dx+dy*dy+dz*dz)<4.5)lP.push(hp[i*3],hp[i*3+1],hp[i*3+2],hp[j*3],hp[j*3+1],hp[j*3+2]);}const lG=new THREE.BufferGeometry();lG.setAttribute('position',new THREE.Float32BufferAttribute(lP,3));const lM=new THREE.LineBasicMaterial({color:0x00e8fc,transparent:true,opacity:.05,blending:THREE.AdditiveBlending});sc.add(new THREE.LineSegments(lG,lM));
+const nN=500,nP=new Float32Array(nN*3),nC=new Float32Array(nN*3);for(let i=0;i<nN;i++){const i3=i*3;nP[i3]=(Math.random()-.5)*90;nP[i3+1]=(Math.random()-.5)*80;nP[i3+2]=(Math.random()-.5)*70;const c=cols[~~(Math.random()*4)];nC[i3]=c.r;nC[i3+1]=c.g;nC[i3+2]=c.b;}const nG=new THREE.BufferGeometry();nG.setAttribute('position',new THREE.BufferAttribute(nP,3));nG.setAttribute('color',new THREE.BufferAttribute(nC,3));const nM=new THREE.PointsMaterial({size:.08,vertexColors:true,transparent:true,opacity:.4,blending:THREE.AdditiveBlending,sizeAttenuation:true});sc.add(new THREE.Points(nG,nM));
+const wi=new THREE.Mesh(new THREE.IcosahedronGeometry(5,3),new THREE.MeshBasicMaterial({color:0x00e8fc,wireframe:true,transparent:true,opacity:.03}));wi.position.set(20,0,-12);sc.add(wi);const wo=new THREE.Mesh(new THREE.IcosahedronGeometry(8,1),new THREE.MeshBasicMaterial({color:0x8b5cf6,wireframe:true,transparent:true,opacity:.015}));wo.position.set(20,0,-12);sc.add(wo);const ring=new THREE.Mesh(new THREE.TorusGeometry(11,.02,8,120),new THREE.MeshBasicMaterial({color:0x00e8fc,transparent:true,opacity:.06}));ring.position.set(20,0,-12);ring.rotation.x=Math.PI/3;sc.add(ring);
+let mx=0,my=0;document.addEventListener('mousemove',e=>{mx=(e.clientX/innerWidth-.5)*2;my=(e.clientY/innerHeight-.5)*2});const ck=new THREE.Clock();
+(function anim(){requestAnimationFrame(anim);const t=ck.getElapsedTime();helix.rotation.y=t*.025+mx*.08;helix.rotation.x=my*.03;wi.rotation.x=t*.08;wi.rotation.y=t*.12;wo.rotation.x=-t*.06;wo.rotation.y=-t*.08;ring.rotation.z=t*.06;rr.render(sc,cam)})();
+addEventListener('resize',()=>{cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix();rr.setSize(innerWidth,innerHeight)});
+function buildSpectra(id,label,color){const el=document.getElementById(id);if(!el||el.querySelector('svg'))return;const W=900,H=260,pL=50,pR=20,pT=30,pB=40,gW=W-pL-pR,gH=H-pT-pB;const peaks=[{x:621,h:.25,w:12},{x:644,h:.3,w:10},{x:757,h:.2,w:15},{x:830,h:.15,w:12},{x:854,h:.35,w:10},{x:1003,h:.85,w:8},{x:1033,h:.3,w:10},{x:1065,h:.25,w:15},{x:1128,h:.2,w:12},{x:1177,h:.15,w:10},{x:1242,h:.45,w:20},{x:1302,h:.4,w:18},{x:1340,h:.35,w:12},{x:1448,h:.6,w:18},{x:1555,h:.3,w:12},{x:1585,h:.35,w:10},{x:1620,h:.25,w:10},{x:1660,h:.7,w:15},{x:1685,h:.25,w:10},{x:2850,h:.15,w:20},{x:2930,h:.35,w:25}];const xMin=500,xMax=3100;const toX=v=>pL+((v-xMin)/(xMax-xMin))*gW;const toY=v=>pT+gH-v*gH;const pts=[];for(let px=0;px<=gW;px++){const wn=xMin+(px/gW)*(xMax-xMin);let y=.05+Math.sin(px*.005)*.02;for(const p of peaks){const d=(wn-p.x)/p.w;y+=p.h*Math.exp(-d*d*.5);}pts.push({x:pL+px,y:toY(Math.min(y,1))});}let path=`M${pts[0].x},${pts[0].y}`+pts.slice(1).map(p=>`L${p.x},${p.y}`).join('');const lPeaks=[1003,1242,1448,1660,2930];let plHTML='';for(const lp of lPeaks){const pk=peaks.find(p=>p.x===lp);if(pk){plHTML+=`<text class="spectra-peak-label" x="${toX(pk.x)}" y="${toY(pk.h)-8}" text-anchor="middle">${pk.x} cm⁻¹</text>`;plHTML+=`<line x1="${toX(pk.x)}" y1="${toY(pk.h)-3}" x2="${toX(pk.x)}" y2="${toY(pk.h)+5}" stroke="${color}" stroke-width=".5" opacity=".4"/>`;}}let gHTML='';for(let wn=600;wn<=3000;wn+=200){gHTML+=`<line class="spectra-grid" x1="${toX(wn)}" y1="${pT}" x2="${toX(wn)}" y2="${pT+gH}"/>`;if(wn%400===0)gHTML+=`<text class="spectra-label" x="${toX(wn)}" y="${H-8}" text-anchor="middle">${wn}</text>`;}for(let i=0;i<=4;i++){const y=pT+(gH/4)*i;gHTML+=`<line class="spectra-grid" x1="${pL}" y1="${y}" x2="${pL+gW}" y2="${y}"/>`;}el.innerHTML=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">${gHTML}<line class="spectra-axis" x1="${pL}" y1="${pT}" x2="${pL}" y2="${pT+gH}"/><line class="spectra-axis" x1="${pL}" y1="${pT+gH}" x2="${pL+gW}" y2="${pT+gH}"/><path class="spectra-glow" d="${path}" stroke="${color}"/><path class="spectra-line" d="${path}" stroke="${color}"/>${plHTML}<text class="spectra-label" x="${pL+gW/2}" y="${H-2}" text-anchor="middle">Raman Shift (cm⁻¹)</text><text class="spectra-label" x="${pL-5}" y="${pT+gH/2}" text-anchor="middle" transform="rotate(-90,${pL-5},${pT+gH/2})">Intensity (a.u.)</text><text class="spectra-title-text" x="${pL+gW-5}" y="${pT+12}" text-anchor="end">${label}</text></svg>`;}
+function go(p){document.getElementById('navLinks').classList.remove('open');document.querySelectorAll('.nav-links a').forEach(a=>a.classList.remove('active'));const act=document.querySelector(`.nav-links a[data-p="${p}"]`);if(act)act.classList.add('active');document.querySelectorAll('.page.on').forEach(pg=>pg.classList.remove('on'));const target=document.getElementById('p-'+p);if(target){target.classList.add('on');target.querySelectorAll('.rv').forEach((el,i)=>{el.classList.remove('vis');setTimeout(()=>el.classList.add('vis'),60*i);});}window.scrollTo({top:0,behavior:'instant'});history.pushState(null,'','#'+p);if(p==='home'){runCounters();setTimeout(()=>buildSpectra('spectraHome','BIOLOGICAL TISSUE — 532nm EXCITATION','#00e8fc'),300);}if(p==='about')setTimeout(()=>buildSpectra('spectraAbout','E. COLI — AMR PROFILING','#22d3ee'),300);if(p==='equipment')setTimeout(()=>buildSpectra('spectraEquip','WITEC ALPHA300R — POLYSTYRENE CALIBRATION','#8b5cf6'),300);}
+window.addEventListener('popstate',()=>{go((location.hash||'#home').replace('#',''));});
+function runCounters(){document.querySelectorAll('[data-c]').forEach(el=>{const t=+el.dataset.c;let c=0;const s=t/40;const iv=setInterval(()=>{c+=s;if(c>=t){c=t;clearInterval(iv);}el.textContent=~~c;},30);});}
+const obs=new IntersectionObserver(e=>{e.forEach(x=>{if(x.isIntersecting)x.target.classList.add('vis');});},{threshold:.08});document.querySelectorAll('.rv').forEach(el=>obs.observe(el));
+addEventListener('scroll',()=>{document.getElementById('topbar').classList.toggle('scrolled',scrollY>40);});
+const init=(location.hash||'#home').replace('#','');if(init!=='home')go(init);else{runCounters();setTimeout(()=>buildSpectra('spectraHome','BIOLOGICAL TISSUE — 532nm EXCITATION','#00e8fc'),500);}
+</script>
+</body>
+</html>
